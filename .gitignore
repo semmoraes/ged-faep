@@ -42,4 +42,7 @@ Thumbs.db
 
 # Upload directory
 backend/uploads/*
-!backend/uploads/.gitkeep 
+!backend/uploads/.gitkeep
+
+NODE_ENV=development
+DATABASE_URL=postgres://postgres:TestPW123@containers-us-west-201.railway.app:7878/railway 
