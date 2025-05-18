@@ -1,21 +1,50 @@
-require('dotenv').config();
-const fs = require('fs').promises;
 const path = require('path');
+const fs = require('fs'); // Usar fs síncrono para este teste inicial
 const { Pool } = require('pg');
 const { logger } = require('../src/utils/logger');
 
+// Log para verificar se .env foi carregado e o valor de DATABASE_URL
+console.log('[DEBUG] Script run-migrations.js iniciado');
+
+// Tentativa de leitura manual do .env
+const envPath = path.resolve(__dirname, '../.env');
+console.log(`[DEBUG] Tentando ler .env de: ${envPath}`);
+try {
+  const envFileContent = fs.readFileSync(envPath, { encoding: 'utf8' });
+  console.log('[DEBUG] Conteúdo do arquivo .env LIDO MANUALMENTE:');
+  console.log(envFileContent);
+  // Tentativa simples de parsear e definir process.env
+  envFileContent.split('\n').forEach(line => {
+    const trimmedLine = line.trim();
+    if (trimmedLine && !trimmedLine.startsWith('#')) {
+      const [key, ...valueParts] = trimmedLine.split('=');
+      const value = valueParts.join('=');
+      if (key && value) {
+        process.env[key.trim()] = value.trim();
+        console.log(`[DEBUG MAN] Definido process.env.${key.trim()} (após leitura manual)`);
+      }
+    }
+  });
+} catch (err) {
+  console.error(`[DEBUG] ERRO ao ler manualmente o arquivo .env de ${envPath}:`, err.message);
+}
+
+console.log(`[DEBUG] NODE_ENV (após tentativa manual): ${process.env.NODE_ENV}`);
+console.log(`[DEBUG] DATABASE_URL (após tentativa manual e antes de usar): ${process.env.DATABASE_URL}`);
+
+if (!process.env.DATABASE_URL) {
+  console.error('[FATAL DEBUG] DATABASE_URL ainda não está definida após tentativa manual! Verifique o arquivo .env e o log de erros de leitura.');
+  process.exit(1);
+}
+
+// Configuração do Pool usando connectionString e SSL false
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  ssl: process.env.DB_SSL === 'true' ? {
-    rejectUnauthorized: false
-  } : undefined
+  connectionString: process.env.DATABASE_URL,
+  ssl: false
 });
 
 async function runMigrations() {
+  console.log(`[DEBUG] Dentro de runMigrations, usando connectionString: ${pool.options ? pool.options.connectionString : 'N/A'}`);
   const client = await pool.connect();
   
   try {
@@ -30,7 +59,7 @@ async function runMigrations() {
 
     // Ler arquivos de migração
     const migrationsDir = path.join(__dirname, '..', 'migrations');
-    const files = await fs.readdir(migrationsDir);
+    const files = await fs.promises.readdir(migrationsDir);
     const sqlFiles = files.filter(f => f.endsWith('.sql')).sort();
 
     // Executar cada migração
@@ -48,7 +77,7 @@ async function runMigrations() {
 
         // Ler e executar o arquivo SQL
         const filePath = path.join(migrationsDir, file);
-        const sql = await fs.readFile(filePath, 'utf8');
+        const sql = await fs.promises.readFile(filePath, 'utf8');
 
         await client.query('BEGIN');
         try {

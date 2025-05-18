@@ -1,4 +1,10 @@
-require('dotenv').config();
+const path = require('path');
+if (process.env.NODE_ENV !== 'production') {
+  // Para backend/src/index.js, o .env está em ../../.env se na raiz do projeto, ou ../.env se na raiz de backend/
+  // Vamos assumir que o .env local que queremos carregar está em backend/.env
+  require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+}
+
 const express = require('express');
 const cors = require('cors');
 const { setupRoutes } = require('./routes');
