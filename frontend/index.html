@@ -11,44 +11,122 @@
     <div class="container">
         <header class="main-header">
             <h1><i class="fas fa-folder-open"></i> GED FAEP</h1>
+            <input type="text" id="global-search-input" placeholder="Buscar em todos os documentos...">
             <div class="user-info">
                 <i class="fas fa-user-circle"></i> Usuário Logado (Admin) <i class="fas fa-sign-out-alt" title="Logout (Protótipo)"></i>
             </div>
         </header>
 
         <main class="content-area">
-            <div id="navigation-area">
-                <div id="breadcrumb-container">
-                    <!-- Breadcrumbs serão inseridos aqui pelo script.js -->
+            <aside id="tree-view-container">
+                <div id="tree-controls">
+                    <button id="expand-all-btn" class="tree-action-btn" title="Expandir Tudo"><i class="fas fa-plus-square"></i> Expandir Tudo</button>
+                    <button id="collapse-all-btn" class="tree-action-btn" title="Recolher Tudo"><i class="fas fa-minus-square"></i> Recolher Tudo</button>
                 </div>
-                <div class="content-header">
-                    <input type="text" id="current-list-search-input" placeholder="Pesquisar na lista atual...">
+                <div id="folder-tree">
+                    <!-- A árvore de pastas hierárquica será renderizada aqui -->
                 </div>
-                <button id="add-document-btn" class="action-btn" style="margin-top: 10px;"><i class="fas fa-plus"></i> Adicionar Documento (Protótipo)</button>
-            </div>
+            </aside>
+            <div id="resize-handle"></div>
+            <section id="main-content-container">
+                <div id="current-folder-header">
+                     <h2 id="current-folder-title">Selecione uma pasta</h2>
+                     <input type="text" id="file-list-search-input" placeholder="Pesquisar arquivos nesta pasta...">
+                </div>
+                <div id="file-list-view">
+                    <!-- A lista de arquivos da pasta selecionada será renderizada aqui como uma tabela -->
+                    <!-- <p>Selecione uma pasta na árvore para ver seus arquivos.</p> Removido placeholder antigo -->
 
-            <div id="item-list-container">
-                <!-- A lista de pastas/arquivos será renderizada aqui -->
-            </div>
-            
-            <div id="item-details-container">
-                <h2 id="content-title">Detalhes do Item</h2>
-                <div id="content-details" class="content-box">
-                    <p>Selecione um item na lista para ver os detalhes aqui.</p>
+                    <div class="document-container" id="vigentes-container">
+                        <h3>DOCUMENTOS VIGENTES</h3>
+                        <div id="vigentes-documents-table-view">
+                            <p>Nenhum documento vigente encontrado ou pasta não selecionada.</p>
+                        </div>
+                    </div>
+
+                    <div class="document-container" id="arquivados-container">
+                        <h3>DOCUMENTOS ARQUIVADOS (Cancelados/Vencidos/Substituídos)</h3>
+                        <div id="arquivados-documents-table-view">
+                            <p>Nenhum documento arquivado encontrado.</p>
+                        </div>
+                    </div>
                 </div>
-                <div id="content-actions" class="content-box">
-                    <!-- Ações contextuais para o item TTD (ex: editar TTD) -->
+                
+                <div id="item-details-container">
+                    <!-- Mantido para possíveis detalhes de ARQUIVO selecionado no futuro, mas o foco é a lista -->
+                    <h3 id="content-title-detail">Detalhes do Item TTD</h3>
+                    <div id="content-details-td" class="content-box">
+                        <p>Selecione um item TTD (da árvore) para ver os detalhes de temporalidade aqui.</p>
+                    </div>
+                    <div id="content-actions-td" class="content-box">
+                        <!-- Ações contextuais para o item TTD (ex: editar TTD) -->
+                    </div>
+                    <div id="audit-info-container-td" class="content-box">
+                        <p>Informações de auditoria do item TTD.</p>
+                    </div>
                 </div>
-                <div id="audit-info-container" class="content-box">
-                    <p>Informações de auditoria aparecerão aqui.</p>
-                </div>
-            </div>
+            </section>
         </main>
         
         <footer>
-            <p>&copy; 2024 Centro Universitário FAEP. Todos os direitos reservados.</p>
+            <p>&copy; 2024 Centro Universitário FAEP. Todos os direitos reservados Fái.</p>
         </footer>
     </div>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
     <script src="script.js"></script>
+
+    <!-- Modal para Adicionar Novo Documento -->
+    <div id="add-document-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn" id="close-add-document-modal-btn">&times;</span>
+            <h2>Adicionar Novo Documento</h2>
+            <p>Classificação TTD: <strong id="modal-ttd-classification"></strong></p>
+            <form id="add-document-form">
+                <div class="form-group">
+                    <label for="doc-name">Nome do Documento (com extensão):</label>
+                    <input type="text" id="doc-name" name="doc-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="doc-description">Descrição:</label>
+                    <textarea id="doc-description" name="doc-description" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="action-btn primary-action-btn">Salvar Documento</button>
+                    <button type="button" class="action-btn" id="cancel-add-document-btn">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Eliminação Lógica de Documento -->
+    <div id="elimination-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn" id="close-elimination-modal-btn">&times;</span>
+            <h2>Confirmar Eliminação de Documento</h2>
+            
+            <div id="elimination-step-1">
+                <p>Atenção: Você está prestes a marcar o documento <strong id="elimination-doc-name">[Nome do Arquivo]</strong> como eliminado. Esta ação indicará que o documento atingiu o fim de sua temporalidade ou não é mais necessário, e será registrada no histórico. Deseja continuar?</p>
+                <div class="form-actions">
+                    <button type="button" class="action-btn primary-action-btn" id="confirm-initial-elimination-btn">Confirmar Intenção</button>
+                    <button type="button" class="action-btn" id="cancel-elimination-step-1-btn">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="elimination-step-2" style="display: none;">
+                <p>Por favor, forneça o motivo da eliminação para o documento <strong id="elimination-doc-name-step-2">[Nome do Arquivo]</strong>:</p>
+                <form id="elimination-reason-form">
+                    <div class="form-group">
+                        <label for="elimination-reason">Motivo da Eliminação (obrigatório):</label>
+                        <textarea id="elimination-reason" name="elimination-reason" rows="4" required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="action-btn primary-action-btn">Concluir Eliminação</button>
+                        <button type="button" class="action-btn" id="cancel-elimination-step-2-btn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html> 

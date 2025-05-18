@@ -25,16 +25,23 @@ body {
     background-color: #f4f7f6;
     color: #333;
     line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .container {
-    width: 90%;
-    max-width: 1400px;
-    margin: 20px auto;
+    width: 100%;
+    max-width: none;
+    margin: 0;
     background-color: #fff;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    border-radius: 8px;
+    box-shadow: none;
+    border-radius: 0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 /* Cabeçalho Principal */
@@ -45,11 +52,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .main-header h1 {
     margin: 0;
     font-size: 1.8em;
+    cursor: pointer;
 }
 
 .main-header .user-info {
@@ -65,136 +74,331 @@ body {
     margin-left: 15px;
 }
 
-/* Área de Conteúdo Principal */
+/* Área de Conteúdo Principal - Adaptada para novo layout */
 .content-area {
     display: flex;
-    flex-direction: column; /* Empilha navigation, list, details */
-    padding: 20px;
+    flex-grow: 1;
+    overflow: hidden;
+    /* padding: 20px; Removido daqui, será por seção */
+    /* min-height: calc(100vh - 150px);  Removido/Ajustado */
 }
 
-/* Área de Navegação (Breadcrumbs e Busca da Lista) */
-#navigation-area {
+/* NOVA SEÇÃO: Tree View Container (Barra Lateral da Árvore) */
+#tree-view-container {
+    /* width: 30%; Ou um valor fixo como 300px - Será controlado por JS */
+    width: 300px; /* Largura inicial padrão */
+    max-width: 70%; /* Limite máximo */
+    min-width: 200px; /* Limite mínimo */
+    background-color: var(--light-gray);
+    padding: 15px;
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto; /* Para rolagem se a árvore for grande */
+    overflow-x: hidden; /* Para evitar scroll horizontal se nomes forem longos demais */
+    flex-shrink: 0; /* Não encolher além do min-width */
+    display: flex;
+    flex-direction: column;
+}
+
+#tree-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.tree-action-btn {
+    background-color: var(--secondary-color);
+    color: var(--text-color-light);
+    border: none;
+    padding: 8px 10px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background-color 0.2s ease;
+}
+
+.tree-action-btn:hover {
+    background-color: var(--primary-color);
+}
+
+.tree-action-btn i {
+    margin-right: 5px;
+}
+
+/* Estilos da Árvore de Pastas */
+#folder-tree ul {
+    list-style-type: none;
+    padding-left: 0; /* Removido padding padrão de ULs */
+}
+
+#folder-tree ul.root-level {
+    padding-left: 0;
+}
+
+#folder-tree li.tree-node {
+    /* margin-bottom: 3px; */
+}
+
+.node-content {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s ease;
+    overflow: hidden;    /* Mantém no container para o caso de padding estourar */
+}
+
+.node-content:hover {
+    background-color: var(--medium-gray);
+}
+
+.node-content.selected {
+    background-color: var(--secondary-color);
+    color: var(--text-color-light);
+}
+
+.node-content.selected .node-icon,
+.node-content.selected .expander i {
+    color: var(--text-color-light); 
+}
+
+.expander {
+    margin-right: 8px;
+    width: 16px; /* Largura fixa para alinhamento */
+    display: inline-block;
+    text-align: center;
+    color: var(--primary-color);
+    flex-shrink: 0; /* Impede que o expansor encolha */
+}
+
+.expander-placeholder {
+    margin-right: 8px;
+    width: 16px;
+    display: inline-block;
+    flex-shrink: 0; /* Impede que o placeholder encolha */
+}
+
+.node-icon {
+    margin-right: 8px;
+    color: var(--primary-color);
+    flex-shrink: 0; /* Impede que o ícone encolha */
+}
+
+.node-name {
+    flex-grow: 1;
+    font-size: 0.95em;
+    white-space: nowrap; /* Impede quebra de linha no nome */
+    overflow: hidden;    /* Esconde texto que transborda */
+    text-overflow: ellipsis; /* Adiciona '...' se o nome for muito longo */
+}
+
+/* NOVA SEÇÃO: Main Content Container (Conteúdo Principal à Direita) */
+#main-content-container {
+    flex-grow: 1; /* Ocupa o restante do espaço */
+    padding: 20px;
+    overflow-y: auto; /* Para rolagem se o conteúdo for grande */
+}
+
+#current-folder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#current-folder-header h2 {
+    margin: 0;
+    font-size: 1.6em;
+    color: var(--primary-color);
+}
+
+#file-list-search-input {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    width: 300px; /* Ou ajuste conforme necessário */
+}
+
+/* Estilos da Tabela de Lista de Arquivos */
+#file-list-view {
+    /* background-color: #fff; */ /* Já está no container pai */
+    /* border: 1px solid #dee2e6; */
+    /* border-radius: 5px; */
+    /* padding: 15px; */
+    margin-bottom: 20px;
+    min-height: 250px; 
+}
+
+.file-list-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.file-list-table th,
+.file-list-table td {
+    border: 1px solid var(--border-color);
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 0.9em;
+}
+
+.file-list-table th {
+    background-color: var(--medium-gray);
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.file-list-table tbody tr:nth-child(odd) {
+    background-color: var(--light-gray);
+}
+
+.file-list-table tbody tr:hover {
+    background-color: #d1e7fd; /* Cor de hover suave */
+}
+
+.file-icon-list {
+    margin-right: 8px;
+    color: var(--secondary-color);
+}
+
+.download-btn {
+    background-color: transparent;
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    padding: 5px 8px;
+}
+
+.download-btn:hover {
+    background-color: var(--secondary-color);
+    color: var(--text-color-light);
+}
+
+/* Área de Navegação (Breadcrumbs e Busca da Lista) - REMOVIDO ou COMENTADO */
+/* #navigation-area {
     padding: 10px;
     background-color: #e9ecef;
     border-radius: 5px;
     margin-bottom: 20px;
-}
+} */
 
-#breadcrumb-container {
+/* #breadcrumb-container {
     margin-bottom: 15px;
     font-size: 0.95em;
-}
+} */
 
-.breadcrumb-item a {
+/* .breadcrumb-item a {
     text-decoration: none;
     color: #0056b3;
-}
+} */
 
-.breadcrumb-item a:hover {
+/* .breadcrumb-item a:hover {
     text-decoration: underline;
-}
+} */
 
-.breadcrumb-item a.active {
+/* .breadcrumb-item a.active {
     color: #333;
     font-weight: bold;
-    pointer-events: none; /* Não clicável */
-}
+    pointer-events: none; 
+} */
 
-.breadcrumb-separator {
+/* .breadcrumb-separator {
     color: #6c757d;
-}
+} */
 
-.content-header input[type="text"] {
+/* .content-header input[type="text"] { 
     width: 100%;
     padding: 10px;
     border: 1px solid #ced4da;
     border-radius: 4px;
     box-sizing: border-box;
-}
+} */
 
-/* Contêiner da Lista de Itens */
-#item-list-container {
+/* Contêiner da Lista de Itens - REMOVIDO OU REUTILIZADO COMO #file-list-view */
+/* #item-list-container {
     background-color: #fff;
     border: 1px solid #dee2e6;
     border-radius: 5px;
     padding: 15px;
     margin-bottom: 20px;
-    min-height: 200px; /* Para dar algum espaço visual */
-}
+    min-height: 200px; 
+} */
 
-.item-list-entry {
+/* .item-list-entry {
     display: flex;
     align-items: center;
     padding: 10px;
     border-bottom: 1px solid #f1f1f1;
     cursor: pointer;
     transition: background-color 0.2s ease;
-}
+} */
 
-.item-list-entry:last-child {
+/* .item-list-entry:last-child {
     border-bottom: none;
-}
+} */
 
-.item-list-entry:hover {
+/* .item-list-entry:hover {
     background-color: #e9ecef;
-}
+} */
 
-.item-list-entry.selected {
-    background-color: #d1e7fd; /* Um azul claro para seleção */
+/* .item-list-entry.selected {
+    background-color: #d1e7fd; 
     font-weight: bold;
-}
+} */
 
-.item-list-entry .item-icon {
+/* .item-list-entry .item-icon {
     margin-right: 12px;
-    color: #0056b3; /* Ícones azuis */
+    color: #0056b3; 
     font-size: 1.2em;
-}
+} */
 
-.item-list-entry .item-icon.fa-file {
-    color: #6c757d; /* Cor diferente para arquivos genéricos */
-}
+/* .item-list-entry .item-icon.fa-file {
+    color: #6c757d; 
+} */
 
-.item-list-entry .item-name {
+/* .item-list-entry .item-name {
     flex-grow: 1;
-}
+} */
 
-.empty-list-message {
+/* .empty-list-message {
     color: #6c757d;
     text-align: center;
     padding: 20px;
     font-style: italic;
-}
+} */
 
-/* Contêiner de Detalhes do Item */
+/* Contêiner de Detalhes do Item TTD - Adaptado */
 #item-details-container {
     background-color: #f8f9fa;
     padding: 20px;
-    border-radius: 5px;
-    border: 1px solid #dee2e6;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    margin-top: 20px; /* Adicionado espaço acima */
 }
 
 .content-box {
     background-color: #fff;
     padding: 15px;
     margin-bottom: 15px;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     border: 1px solid #e0e0e0;
 }
 
-#content-title {
+#content-title-detail { /* Renomeado de #content-title */
     margin-top: 0;
     margin-bottom: 15px;
-    color: #0056b3;
-    font-size: 1.5em;
-    border-bottom: 2px solid #e0e0e0;
+    color: var(--primary-color);
+    font-size: 1.3em; /* Ajustado para ser menos proeminente que o título da pasta */
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
 }
 
-#content-details strong { /* Para o ID */
+#content-details-td strong { /* Para o ID da classificação TTD */
     color: #495057;
 }
 
-/* Estilos para a Seção de Temporalidade */
+/* Estilos para a Seção de Temporalidade (mantidos e devem funcionar) */
 .temporalidade-container {
     margin-top: 15px;
     padding: 15px;
@@ -255,6 +459,7 @@ footer {
     background-color: #343a40;
     color: #fff;
     font-size: 0.85em;
+    flex-shrink: 0;
 }
 
 /* Estilos para responsividade (básico) */
@@ -737,4 +942,253 @@ footer {
     text-align: center;
     padding: 1rem;
     font-size: 0.9rem;
+}
+
+/* Estilos para o Modal de Adicionar Documento */
+.modal {
+    display: none; /* Oculto por padrão */
+    position: fixed; /* Fica fixo na tela */
+    z-index: 1000; /* Fica sobre outros elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Habilita scroll se necessário */
+    background-color: rgba(0,0,0,0.5); /* Fundo preto semi-transparente */
+    padding-top: 60px; /* Espaço para o conteúdo do modal */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 5% do topo e centralizado horizontalmente */
+    padding: 25px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px; /* Largura máxima */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.close-modal-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-modal-btn:hover,
+.close-modal-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal h2 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: calc(100% - 20px); /* Ajusta para padding interno se houver */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Importante para o width funcionar corretamente com padding */
+}
+
+.form-group textarea {
+    resize: vertical; /* Permite redimensionar verticalmente */
+}
+
+.form-actions {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.form-actions .action-btn {
+    margin-left: 10px;
+}
+
+/* Estilos para botões de ação primários (como o de Salvar no modal) */
+.primary-action-btn {
+    background-color: #007bff; /* Azul padrão Bootstrap */
+    color: white;
+    border-color: #007bff;
+}
+
+.primary-action-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Estilos para Documentos Eliminados na Lista */
+.file-list-table tbody tr.document-eliminado td {
+    background-color: #f0f0f0; /* Cinza claro para o fundo */
+    color: #888; /* Cor de texto mais clara */
+}
+
+.file-list-table tbody tr.document-eliminado .file-icon-list {
+    color: #aaa; /* Ícone do arquivo mais apagado */
+}
+
+.file-list-table tbody tr.document-eliminado td:first-child { /* Nome do arquivo */
+    text-decoration: line-through; /* Tachado */
+}
+
+.file-list-table .status-eliminado {
+    font-weight: bold;
+    color: #dc3545; /* Vermelho para destacar status */
+}
+
+/* Estilo para o botão de deletar */
+.action-btn-delete {
+    background-color: #dc3545; /* Vermelho */
+    border-color: #dc3545;
+}
+
+.action-btn-delete:hover {
+    background-color: #c82333; /* Vermelho mais escuro no hover */
+    border-color: #bd2130;
+}
+
+.action-btn:disabled {
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.action-btn:disabled:hover {
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #666;
+}
+
+/* Estilos para os Contêineres de Documentos Vigentes e Arquivados */
+.document-container {
+    margin-bottom: 30px; /* Espaço entre os contêineres */
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: #f9f9f9; /* Um fundo levemente diferente para cada seção */
+}
+
+.document-container h3 {
+    color: var(--primary-color);
+    font-size: 1.4em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--medium-gray);
+}
+
+/* Ajustes na tabela para caber bem dentro dos contêineres */
+.document-container .file-list-table th,
+.document-container .file-list-table td {
+    font-size: 0.88em; /* Levemente menor para mais densidade se necessário */
+}
+
+/* Mensagem de placeholder dentro das table-views */
+#vigentes-documents-table-view p,
+#arquivados-documents-table-view p {
+    padding: 15px;
+    text-align: center;
+    color: var(--dark-gray);
+    font-style: italic;
+}
+
+/* Novos/Ajustados estilos para Documentos Arquivados */
+.file-list-table tbody tr.document-arquivado td {
+    background-color: #e9ecef; /* Um cinza um pouco diferente para arquivados */
+    color: #6c757d; 
+}
+
+.file-list-table tbody tr.document-arquivado .file-icon-list {
+    color: #adb5bd;
+}
+
+.file-list-table tbody tr.document-arquivado td:first-child { 
+    /* Opcional: manter o tachado ou usar outro indicador */
+    /* text-decoration: line-through; */ 
+    font-style: italic;
+}
+
+.file-list-table .status-eliminado, /* Manter para status antigo se houver */
+.file-list-table .status-arquivado {
+    font-weight: bold;
+    color: #6c757d; /* Cor mais neutra para arquivado/vencido/cancelado */
+}
+
+.file-list-table .status-arquivado.status-cancelado {
+    color: #dc3545; /* Vermelho para cancelado se quiser destaque */
+}
+.file-list-table .status-arquivado.status-vencido {
+    color: #ffc107; /* Amarelo/Laranja para vencido se quiser destaque */
+}
+
+/* Estilo para o botão de deletar (eliminar logicamente - agora pode ser usado para o "cancelar vigor" se o visual for apropriado) */
+.action-btn-delete { /* Pode ser reutilizado ou ter um novo específico como action-btn-cancel */
+    background-color: #dc3545; /* Vermelho */
+    border-color: #dc3545;
+}
+
+.action-btn-delete:hover {
+    background-color: #c82333; /* Vermelho mais escuro no hover */
+    border-color: #bd2130;
+}
+
+/* Novo estilo para o botão de Cancelar Vigor (se diferente do delete) */
+.action-btn-cancel {
+    background-color: #ffc107; /* Amarelo/Laranja como sugestão */
+    border-color: #ffc107;
+    color: #212529; /* Texto escuro para contraste com amarelo */
+}
+
+.action-btn-cancel:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+}
+
+/* Handle para redimensionamento */
+#resize-handle {
+    width: 6px;
+    background-color: var(--medium-gray);
+    cursor: col-resize;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+}
+
+#resize-handle:hover {
+    background-color: var(--dark-gray);
+}
+
+#folder-tree {
+    overflow-y: auto; /* Scroll para a árvore em si */
+    flex-grow: 1; /* Para ocupar espaço no tree-view-container */
+}
+
+/* Estilo para o campo de busca global */
+#global-search-input {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    width: 350px; /* Ou ajuste conforme necessário */
+    margin: 0 20px; /* Espaçamento lateral */
+    font-size: 0.9em;
 } 

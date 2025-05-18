@@ -1,146 +1,121 @@
-# Protótipo de Sistema de Gestão Eletrônica de Documentos (GED) para Instituição de Ensino
+# Protótipo GED FAEP - Sistema de Gerenciamento Eletrônico de Documentos
 
-## Descrição Curta
+Este repositório contém o código-fonte do protótipo do Sistema de Gerenciamento Eletrônico de Documentos (GED) para a FAEP. O foco atual é no desenvolvimento do frontend para simular as interações e funcionalidades chave de um GED, com ênfase na Tabela de Temporalidade de Documentos (TTD).
 
-Este projeto é um protótipo interativo de um Sistema de Gestão Eletrônica de Documentos (GED) focado nas necessidades operacionais de uma instituição de ensino superior e técnico privada. O sistema demonstra funcionalidades chave como navegação hierárquica de pastas, gerenciamento de metadados de arquivos (incluindo temporalidade e descarte), e simulação do ciclo de vida documental (criação, edição, eliminação lógica).
+## Visão Geral do Protótipo
 
-## Status do Projeto
+O protótipo visa demonstrar:
 
-ℹ️ **Protótipo em Desenvolvimento Ativo**
+*   Navegação hierárquica baseada na Tabela de Temporalidade de Documentos.
+*   Visualização de documentos (mockados) dentro de cada classificação da TTD.
+*   Exibição de metadados detalhados dos documentos, incluindo informações de temporalidade (Prazo Corrente, Prazo Intermediário, Destinação Final).
+*   Simulação de ciclo de vida do documento:
+    *   Adição de novos documentos (mockados) a uma classificação TTD.
+    *   "Cancelamento" lógico de documentos com motivo.
+    *   Diferenciação visual e funcional entre documentos "Vigentes" e "Arquivados" (Cancelados, Vencidos).
+    *   Simulação de vencimento de documentos baseado em uma data de validade.
+*   Persistência de dados da sessão utilizando o `localStorage` do navegador.
+*   Interface com árvore de pastas lateral e área de conteúdo principal para visualização de arquivos e detalhes da TTD.
+*   Painel da árvore de pastas redimensionável.
+*   Busca de arquivos dentro da pasta TTD selecionada.
+*   Busca global de documentos em todos os metadados.
+*   Layout responsivo que ocupa 100% da tela.
 
-## Objetivos do Protótipo
+## Tecnologias Utilizadas (Frontend)
 
-* Validar a experiência do usuário (UX) para navegação, busca e gerenciamento de documentos em um ambiente que pode conter grande volume de informações.
-* Demonstrar a apresentação clara e completa de metadados de arquivos, incluindo informações cruciais de temporalidade (Prazos Corrente, Intermediário, Destinação Final) e rastreabilidade de ações.
-* Simular as operações básicas de CRUD (Create, Read, Update, Delete) e o ciclo de vida dos documentos (versionamento, marcação como eliminado) em um ambiente controlado.
-* Servir como base para discussões e refinamento de requisitos para um futuro sistema GED de produção.
+*   **HTML5:** Estrutura da aplicação.
+*   **CSS3:** Estilização e layout.
+*   **JavaScript (Vanilla):** Lógica da aplicação, manipulação do DOM, interações e simulação de dados.
+*   **Font Awesome:** Ícones.
 
-## Funcionalidades Implementadas / Em Implementação
+## Como Executar o Protótipo
 
-* **Navegação em Árvore de Pastas:**
-    * Visualização hierárquica da estrutura de pastas (TTD IFES).
-    * Expansão e retração de nós individuais da árvore.
-    * Botões globais "Expandir Tudo" e "Retrair Tudo" para a árvore.
-* **Visualização de Conteúdo de Pastas:**
-    * Exibição da lista de arquivos (mockados) contidos na pasta selecionada em formato de tabela.
-    * Filtro dinâmico por nome e descrição do arquivo na lista.
-* **Detalhes Completos por Arquivo (Exibidos na Tabela):**
-    * Nome do Arquivo (com ícone de tipo)
-    * Descrição
-    * Data de Anexo (simulada, `attachmentDate`)
-    * Data da Última Modificação (simulada, `lastModifiedDate`)
-    * Versão do Documento (simulada, `version`)
-    * Usuário Responsável (simulado, `user`)
-    * Status do Documento (simulado: "Ativo", "Eliminado")
-    * Detalhes da Eliminação (via tooltip, se aplicável): Data, Usuário, Motivo.
-    * **Informações de Temporalidade (derivadas do contexto da pasta/classificação TTD):**
-        * Prazo Corrente (PC)
-        * Prazo Intermediário (PI)
-        * Destinação Final (DF)
-        * Observações (Obs.)
-* **Ações em Arquivos (Parcialmente Implementadas/Planejadas):**
-    * **Download:** Simulação do download de um arquivo (implementado).
-    * **Editar:** (Planejado) Simulação de edição com atualização de versão, data de modificação e usuário.
-    * **Marcar como Eliminado:** (Planejado) Simulação de eliminação lógica com confirmação, motivo, e atualização de metadados.
-* **Inserção de Novo Documento (Planejada):**
-    * (Planejado) Botão para iniciar o processo, formulário para metadados básicos, adição à lista.
-* **Melhorias de UX (Planejadas):**
-    * Paginação para listas de arquivos grandes.
-
-## Estrutura de Dados Chave (Metadados Principais dos Arquivos Simulados em `frontend/script.js`)
-
-*   **Arquivos (objetos JavaScript):**
-    *   `id`: (string) Identificador único do arquivo (ex: `file-PastaNome-1`).
-    *   `name`: (string) Nome do arquivo (ex: `Relatorio_Financeiro_v2.pdf`).
-    *   `description`: (string) Descrição breve do arquivo.
-    *   `attachmentDate`: (string) Data de anexo formatada (DD/MM/AAAA).
-    *   `lastModifiedDate`: (string) Data da última modificação formatada (DD/MM/AAAA HH:MM).
-    *   `version`: (string) Versão do arquivo (ex: `v1.2`).
-    *   `user`: (string) Nome do usuário da última modificação/anexo.
-    *   `status`: (string) "Ativo" ou "Eliminado".
-    *   `eliminationDetails`: (object | null) Se `status` for "Eliminado":
-        *   `date`: (string) Data da eliminação (DD/MM/AAAA).
-        *   `reason`: (string) Motivo da eliminação.
-        *   `responsible`: (string) Usuário que eliminou.
-    *   `type`: (string) Atualmente fixo como `'file'`.
-    *   *Nota: Informações de Temporalidade (PC, PI, DF, Obs) são derivadas dinamicamente do item de classificação TTD pai da pasta selecionada, não armazenadas diretamente em cada objeto de arquivo.*
-
-## Tecnologias Utilizadas no Protótipo Frontend
-
-*   **Linguagens:** HTML5, CSS3, JavaScript (ES6+)
-*   **Estrutura:** Arquivos estáticos (`index.html`, `style.css`, `script.js`).
-*   **Dados:** Mock data (objetos JavaScript) definidos diretamente em `frontend/script.js`.
-*   **Estilização:** CSS puro.
-*   **Ícones:** Font Awesome (via CDN referenciada no `index.html`).
-*   **Bibliotecas UI:** Nenhuma biblioteca de componentes UI externa (como React, Vue, Angular, etc.) está sendo utilizada no frontend no momento.
-
-## Backend (Configurado Separadamente)
-
-Este protótipo frontend interage (ou interagirá) com um backend Node.js/Express com PostgreSQL, implantado no Railway. A configuração e desenvolvimento do backend são tratados em um contexto separado. Este README foca primariamente no protótipo frontend.
-
-## Como Executar o Protótipo Frontend
-
-1.  **Clone o repositório (se ainda não o fez):**
+1.  Clone este repositório:
     ```bash
-    git clone [COLOQUE_A_URL_DO_SEU_REPOSITORIO_AQUI]
+    git clone <url_do_repositorio>
     ```
-2.  **Navegue até o diretório do projeto:**
+2.  Navegue até a pasta do projeto:
     ```bash
-    cd [NOME_DA_PASTA_DO_PROJETO_GED_FAEP]
+    cd <nome_da_pasta_do_projeto>
     ```
-3.  **Abra o arquivo principal no navegador:**
-    *   Navegue até a pasta `frontend`.
-    *   Abra o arquivo `index.html` diretamente em seu navegador web (Ex: Chrome, Firefox, Edge).
+3.  Abra o arquivo `frontend/index.html` diretamente em um navegador web moderno (Chrome, Firefox, Edge, Safari).
 
-4.  **(Opcional) Use um servidor HTTP local para desenvolvimento:**
-    Se preferir servir os arquivos através de um servidor local (útil para evitar algumas restrições de `file:///` e simular um ambiente web mais real):
-    *   Certifique-se de ter o Python instalado.
-    *   Abra seu terminal/prompt de comando.
-    *   Navegue até a pasta `frontend` do projeto:
-        ```bash
-        cd frontend
-        ```
-    *   Execute um dos seguintes comandos (dependendo da sua versão do Python):
-        ```bash
-        # Python 3.x
-        python -m http.server
-        # Python 2.x
-        # python -m SimpleHTTPServer
-        ```
-    *   Abra seu navegador e acesse `http://localhost:8000` (ou a porta indicada pelo servidor).
+Alternativamente, para uma experiência mais próxima de um ambiente de desenvolvimento web, você pode servir a pasta `frontend` usando um servidor HTTP simples. Se você tiver Python instalado:
 
-## Estrutura do Projeto
+*   **Python 3:**
+    ```bash
+    cd frontend
+    python -m http.server
+    ```
+*   Acesse `http://localhost:8000` (ou a porta indicada) no seu navegador.
 
-    /
-    ├── backend/                # Código do backend (Node.js, Express, Prisma, etc.)
-    │   ├── prisma/
-    │   ├── scripts/
-    │   ├── src/
-    │   ├── .env.example
-    │   ├── package.json
-    │   └── ...
-    ├── frontend/               # Código do protótipo frontend
-    │   ├── assets/             # Para imagens, ícones locais (se houver)
-    │   ├── index.html          # Estrutura principal da página
-    │   ├── script.js           # Lógica JavaScript do frontend
-    │   └── style.css           # Estilos CSS
-    ├── .gitignore
-    └── README.md               # Este arquivo
+## Estrutura do Projeto (Simplificada)
 
-## Próximos Passos / Funcionalidades Planejadas (Frontend)
+```
+GED_FAEP/
+├── backend/         # (Configurado anteriormente, mas não diretamente usado pelo protótipo frontend atual para persistência de dados)
+│   ├── prisma/
+│   ├── scripts/
+│   └── src/
+├── frontend/
+│   ├── index.html   # Arquivo principal da interface
+│   ├── style.css    # Folha de estilos
+│   └── script.js    # Lógica JavaScript do frontend
+└── README.md        # Este arquivo
+```
 
-*   Implementar paginação para a lista de arquivos.
-*   Implementar simulação completa de "Editar Documento".
-*   Implementar simulação completa de "Marcar como Eliminado" com modal de confirmação e motivo.
-*   Implementar simulação de "Inserir Novo Documento" com formulário/modal.
-*   (Opcional) Busca por nome de pasta na árvore.
-*   (Opcional) Simulação de diferentes perfis de usuário com permissões distintas.
-*   (Opcional) Histórico de versões mais detalhado.
+## Persistência de Dados no Protótipo GED FAEP
 
-## Contribuição
+### Situação Atual
 
-[Indicar se é um projeto interno ou aberto a contribuições. Se aberto, detalhar como contribuir.]
+Este protótipo do sistema GED FAEP utiliza o **`localStorage` do navegador web** para simular a persistência de dados. Isso inclui:
 
-## Licença
+*   A estrutura hierárquica da Tabela de Temporalidade de Documentos (TTD), que funciona como o sistema de pastas.
+*   Os metadados de todos os documentos (mockados) criados e associados às classificações TTD.
+*   Quaisquer alterações realizadas pelo usuário durante a sessão, como adição de novos documentos, cancelamento de documentos existentes, e modificações simuladas.
 
-[Especificar a licença do projeto. Ex: "Todos os direitos reservados."]
+**Limitações do `localStorage`:**
+
+A abordagem com `localStorage` é altamente eficaz para fins de prototipagem rápida e demonstração de funcionalidades em um ambiente de usuário único. No entanto, possui limitações intrínsecas que o tornam inadequado para uma aplicação de produção completa:
+
+*   **Capacidade de Armazenamento Limitada:** O `localStorage` geralmente tem um limite de armazenamento de 5MB a 10MB por domínio, o que é insuficiente para um grande volume de metadados ou, crucialmente, para os próprios arquivos de documentos.
+*   **Dados Restritos ao Navegador/Máquina:** Os dados salvos no `localStorage` são específicos do navegador e do perfil de usuário na máquina onde a aplicação foi acessada. Eles não são compartilhados entre diferentes navegadores, máquinas ou usuários.
+*   **Não é uma Solução Multiusuário:** Não oferece suporte para acesso concorrente, colaboração ou gerenciamento de permissões para múltiplos usuários.
+*   **Segurança e Backup:** Não fornece mecanismos robustos de segurança de dados, controle de acesso granular ou estratégias de backup centralizadas.
+*   **Gerenciamento de Arquivos Binários:** O `localStorage` não é projetado para armazenar arquivos binários (como PDFs, DOCXs, etc.) de forma eficiente ou prática.
+
+### Próximos Passos para Persistência Real e Funcionalidades Avançadas
+
+A pergunta "isso é possível já estar conectado a um banco de dados para que os documentos possam e comecem ser anexados e guardados no banco de dados?" é fundamental para a evolução do protótipo para um sistema funcional.
+
+**Resposta:** Para que o sistema GED FAEP possa anexar, guardar, versionar e gerenciar documentos de forma robusta, segura, escalável e acessível por múltiplos usuários (com diferentes níveis de permissão), a **integração com um serviço de backend dedicado, um sistema de banco de dados e uma solução de armazenamento de arquivos é essencial.** Esta transição representaria uma próxima fase significativa no desenvolvimento, transformando o protótipo atual em uma aplicação de produção completa e confiável.
+
+**Componentes Necessários para uma Solução Completa (Visão Geral):**
+
+1.  **Desenvolvimento de Backend (Serviço de API):**
+    *   **Responsabilidade:** Orquestrar toda a lógica de negócios, segurança e comunicação com o banco de dados e o sistema de armazenamento de arquivos.
+    *   **Funcionalidades:**
+        *   APIs RESTful (ou GraphQL) para operações CRUD (Criar, Ler, Atualizar, Deletar) em pastas (classificações TTD) e metadados de documentos.
+        *   Gerenciamento de upload e download de arquivos.
+        *   Controle de versionamento de documentos.
+        *   Autenticação e autorização de usuários (controle de acesso).
+        *   Lógica para aplicar regras da TTD (prazos, destinação).
+        *   Registro de logs de auditoria.
+        *   Busca avançada nos metadados e, potencialmente, indexação de conteúdo de arquivos.
+    *   **Tecnologias Sugeridas:** Node.js com Express.js (mantendo a linguagem JavaScript/TypeScript do frontend), Python com Django/Flask, Java com Spring Boot, C# com .NET Core, etc.
+
+2.  **Banco de Dados (para Metadados e Estrutura):**
+    *   **Responsabilidade:** Armazenar de forma estruturada e eficiente todos os metadados dos documentos, a estrutura da TTD, informações de usuários, permissões, logs de auditoria, e outros dados relacionais.
+    *   **Tecnologias Sugeridas:**
+        *   **Relacionais (SQL):** PostgreSQL (altamente recomendado pela robustez e funcionalidades), MySQL, SQL Server.
+        *   **NoSQL (Documento):** MongoDB (pode ser uma opção se a flexibilidade do esquema for um grande requisito, mas bancos relacionais são geralmente preferidos para a complexidade de metadados de GED).
+
+3.  **Armazenamento de Arquivos (para Binários):**
+    *   **Responsabilidade:** Guardar os arquivos de documentos em si (PDFs, DOCXs, XLSX, imagens, etc.).
+    *   **Tecnologias Sugeridas:**
+        *   **Serviços de Armazenamento em Nuvem:** AWS S3 (Simple Storage Service), Google Cloud Storage, Azure Blob Storage. Estes são escaláveis, duráveis e oferecem integrações facilitadas.
+        *   **Soluções Self-Hosted:** MinIO (compatível com API S3, pode ser hospedado localmente), ou diretamente no sistema de arquivos do servidor de backend (menos recomendado para escalabilidade e gerenciamento em produção).
+
+**Para o Protótipo Atual:**
+
+Reafirmamos que, para manter a agilidade e o foco nas funcionalidades de interface e experiência do usuário nesta fase de prototipação, continuaremos utilizando o `localStorage`. A transição para uma arquitetura com backend e banco de dados será planejada e executada como uma fase subsequente e mais extensa do projeto, caso haja a decisão de evoluir o protótipo para uma solução de produção.
